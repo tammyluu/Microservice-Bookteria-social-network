@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }*/
 
-  /*  @ExceptionHandler( value = RuntimeException.class)
+ /*   @ExceptionHandler( value = RuntimeException.class)
     ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(1001);
@@ -34,6 +34,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(apiResponse);
     }
 
+
     @ExceptionHandler( value = AppException.class)
     ResponseEntity<ApiResponse> handleAppException(AppException ex) {
         //In service , we throw AppException et load error code, now we get  this error code
@@ -48,14 +49,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException ex) {
-        String enumKey = ex.getFieldError().getDefaultMessage();
+    ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException exception){
+        String enumKey = exception.getFieldError().getDefaultMessage();
+
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
-        try{
+
+        try {
             errorCode = ErrorCode.valueOf(enumKey);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e){
 
         }
+
         ApiResponse apiResponse = new ApiResponse();
 
         apiResponse.setCode(errorCode.getCode());

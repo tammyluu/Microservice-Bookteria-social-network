@@ -1,5 +1,6 @@
-package com.tammy.identityservice.dto.response;
+package com.tammy.identityservice.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,8 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuthenticationResponse {
+public class IntrospectRequest {
     String token;
-    // true, supply correct pw
-    boolean authenticated;
 }
