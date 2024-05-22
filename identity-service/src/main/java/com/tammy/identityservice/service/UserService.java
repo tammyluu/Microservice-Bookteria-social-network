@@ -4,6 +4,7 @@ import com.tammy.identityservice.dto.request.UserCreationRequest;
 import com.tammy.identityservice.dto.request.UserUpdateRequest;
 import com.tammy.identityservice.dto.response.UserResponse;
 import com.tammy.identityservice.entity.User;
+import com.tammy.identityservice.enums.Role;
 import com.tammy.identityservice.exception.AppException;
 import com.tammy.identityservice.exception.ErrorCode;
 import com.tammy.identityservice.mapper.IUserMapper;
@@ -11,11 +12,10 @@ import com.tammy.identityservice.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -25,7 +25,7 @@ public class UserService {
 
     UserRepository userRepository;
     IUserMapper userMapper;
-
+    PasswordEncoder passwordEncoder;
 
     /* V1
     public User createUser(UserCreationRequest req) {
@@ -45,21 +45,25 @@ public class UserService {
     }*/
 
     // V2 avec mapstruct
-    public User createUser(UserCreationRequest request){
+    public UserResponse createUser(UserCreationRequest request){
         if (userRepository.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USER_EXISTED);
 
         User user = userMapper.toUser(request);
-        // param: strength of bcrypt, par default is 10, if it's the more greater the more difficult but it need too much time for hash so performance not good,
-        //par convention the time tp crypt is less than 1s
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        return userRepository.save(user);
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Role.USER.name());
+
+        user.setRoles(roles);
+
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserResponse> getUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toUserResponse).toList();
 
     }
     public UserResponse getUser(String id){
@@ -69,7 +73,8 @@ public class UserService {
 
 
 
-   /*// V1
+   /*
+   // V1
    public User updateUser(String id, UserUpdateRequest req) {
         User user = getUserById(id);
         user.setPassword(req.getPassword());

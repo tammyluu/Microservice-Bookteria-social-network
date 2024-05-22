@@ -9,6 +9,7 @@ import com.tammy.identityservice.dto.request.AuthenticationRequest;
 import com.tammy.identityservice.dto.request.IntrospectRequest;
 import com.tammy.identityservice.dto.response.AuthenticationResponse;
 import com.tammy.identityservice.dto.response.IntrospectResponse;
+import com.tammy.identityservice.entity.User;
 import com.tammy.identityservice.exception.AppException;
 import com.tammy.identityservice.exception.ErrorCode;
 import com.tammy.identityservice.repository.UserRepository;
@@ -22,11 +23,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +53,7 @@ public class AuthenticationService {
         //verify is token valid for comparing system which is issued before?
         if (!authenticated)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
-        var token = generateToken(request.getUsername());
+        var token = generateToken(user);
         //return token for user
         return AuthenticationResponse.builder()
                 .token(token)
@@ -58,18 +61,18 @@ public class AuthenticationService {
                 .build();
     }
     // create a token _ step by step
-    private String generateToken(String username) {
+    private String generateToken(User user) {
         // first step : create a header contains algo that we use -> HS512
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         // Need a body and content we want to send inside token
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username) // subject is a username
+                .subject(user.getUsername()) // subject is a username
                 .issuer("tammy.com") //indentify token is issued by whom(domain)
                 .issueTime(new Date()) //current date
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli() //expired date
                 ))
-                .claim("userId", "Custom")//optional
+                .claim("scope", buildScope(user))// scope for recognize roles
                 .build();
         // 2nd step :  create payload which has a constructor with 2 params : jwtClamSet & JsonObject
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -101,5 +104,11 @@ public class AuthenticationService {
                 .valid(verified && expiryTime.after(new Date())) // time expiry must be after current date
                 .build();
 
+    }
+    private String buildScope (User user){
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if (!CollectionUtils.isEmpty(user.getRoles()))
+            user.getRoles().forEach(stringJoiner::add);
+        return stringJoiner.toString();
     }
 }
