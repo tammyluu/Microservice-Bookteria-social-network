@@ -1,4 +1,4 @@
-package com.tammy.identityservice.dto.request;
+package com.tammy.identityservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApiResponse <T>{
     @Builder.Default
-    int code = 1000;
+    int code = 200;
     String message; //for error only
     T result;
 }

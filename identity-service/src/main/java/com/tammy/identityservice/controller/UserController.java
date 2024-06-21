@@ -1,17 +1,17 @@
 package com.tammy.identityservice.controller;
 
+import com.tammy.identityservice.dto.response.ApiResponse;
 import com.tammy.identityservice.dto.request.UserCreationRequest;
 import com.tammy.identityservice.dto.request.UserUpdateRequest;
-import com.tammy.identityservice.dto.request.ApiResponse;
 import com.tammy.identityservice.dto.response.UserResponse;
-import com.tammy.identityservice.entity.User;
 import com.tammy.identityservice.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +21,15 @@ import java.util.List;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Tag(name = "User Controller")
 @Slf4j
 public class UserController {
 
     UserService userService;
 
+
+
+    @Operation(method = "POST", summary = "Add new user", description = "Send a request via this API to create new user")
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
 
@@ -33,6 +37,8 @@ public class UserController {
                 .result(userService.createUser(request))
                 .build();
     }
+
+    @Operation(summary = "Get list of users per pageNo", description = "Send a request via this API to get user list ")
     @GetMapping
     ApiResponse<List<UserResponse>> getUsers() {
         // SecurityContextHolder contains infos of user which is signing in now
@@ -44,14 +50,23 @@ public class UserController {
                 .result(userService.getUsers())
                 .build();
     }
-
+    @Operation(summary = "Get user detail", description = "Send a request via this API to get user information by Id")
     @GetMapping("/{userId}")
     ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId){
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getUser(userId))
                 .build();
     }
+    // this is for user to get their own info by token without param
+    @Operation(summary = "Get user detail", description = "Send a request via this API to get user information")
+    @GetMapping("/myInfo")
+    ApiResponse<UserResponse> getMyInfo(){
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
+    }
 
+    @Operation(summary = "Update user", description = "Send a request via this API to update user")
     @PutMapping("/{userId}")
     ApiResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request){
         return ApiResponse.<UserResponse>builder()

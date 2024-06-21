@@ -1,7 +1,7 @@
 package com.tammy.identityservice.controller;
 
 import com.nimbusds.jose.JOSEException;
-import com.tammy.identityservice.dto.request.ApiResponse;
+import com.tammy.identityservice.dto.response.ApiResponse;
 import com.tammy.identityservice.dto.request.AuthenticationRequest;
 import com.tammy.identityservice.dto.request.IntrospectRequest;
 import com.tammy.identityservice.dto.response.AuthenticationResponse;

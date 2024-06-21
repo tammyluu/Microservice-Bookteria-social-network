@@ -1,14 +1,22 @@
 package com.tammy.identityservice.exception;
 
-import com.tammy.identityservice.dto.request.ApiResponse;
+import com.tammy.identityservice.dto.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.View;
+
+import java.nio.file.AccessDeniedException;
 
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    private final View error;
+
+    public GlobalExceptionHandler(View error) {
+        this.error = error;
+    }
     // Response by String message
     /*@ExceptionHandler( value = RuntimeException.class)
     ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
@@ -33,9 +41,21 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
+    // Exception for AccessDeniedException
+    @ExceptionHandler(value = AccessDeniedException.class)
+    ResponseEntity<ApiResponse> handlingAccessDeniedException(AccessDeniedException exception){
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+        // return response entity with body (status, code, message)
+        return ResponseEntity.status(errorCode.getStatusCode()).body(
+                ApiResponse.builder()
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build()
+        );
+    }
 
 
-    @ExceptionHandler( value = AppException.class)
+    @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handleAppException(AppException ex) {
         //In service , we throw AppException et load error code, now we get  this error code
         ErrorCode errorCode = ex.getErrorCode();
@@ -45,7 +65,9 @@ public class GlobalExceptionHandler {
         apiResponse.setCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
 
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity
+                .status(errorCode.getStatusCode())
+                .body(apiResponse);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)

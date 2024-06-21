@@ -21,7 +21,7 @@ import java.util.HashSet;
 public class ApplicationInitConfig {
 
     PasswordEncoder passwordEncoder;
-
+    // app run init everytime to create admin in this class, so that app will be restarted frequently and we should check
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository){
         return args -> {
@@ -32,7 +32,7 @@ public class ApplicationInitConfig {
                 User user = User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
-                        .roles(roles)
+                        //.roles(roles)
                         .build();
 
                 userRepository.save(user);
