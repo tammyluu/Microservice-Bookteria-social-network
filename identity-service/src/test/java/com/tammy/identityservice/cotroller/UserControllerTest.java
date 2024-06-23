@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,6 +30,7 @@ import java.time.LocalDate;
 @SpringBootTest
 @Slf4j
 @AutoConfigureMockMvc
+@TestPropertySource("/test.properties")
 public class UserControllerTest {
 
     @Autowired
@@ -63,7 +65,7 @@ public class UserControllerTest {
     @Test
     void createUserWithValidRequestIsSuccessful() throws Exception {
         // Test happy case 1: create user successfully
-        // Given : Input data -> InitData
+        // GIVEN : Input data -> InitData
         // object to String
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
