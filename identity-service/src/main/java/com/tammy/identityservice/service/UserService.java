@@ -51,6 +51,7 @@ public class UserService {
 
     // V2 avec mapstruct
     public UserResponse createUser(UserCreationRequest request){
+        log.info("In method create User of layer SERVICE");
         if (userRepository.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USER_EXISTED);
 

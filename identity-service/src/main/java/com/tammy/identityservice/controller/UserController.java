@@ -32,7 +32,7 @@ public class UserController {
     @Operation(method = "POST", summary = "Add new user", description = "Send a request via this API to create new user")
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
-
+        log.info("In method create User of layer CONTROLLER");
         return ApiResponse.<UserResponse>builder()
                 .result(userService.createUser(request))
                 .build();

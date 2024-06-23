@@ -1,6 +1,6 @@
 package com.tammy.identityservice.dto.request;
 
-import com.tammy.identityservice.exception.ErrorCode;
+
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
